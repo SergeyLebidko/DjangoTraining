@@ -29,8 +29,8 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name='Клиент')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Товар')
     count = models.IntegerField(verbose_name='Количество')
     dt_create = models.DateField(verbose_name='Дата заказа')
 
