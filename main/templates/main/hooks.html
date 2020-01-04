@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Django Training</title>
+</head>
+<body>
+    <p>
+        Хуки:<br>
+        <ul>
+            {% for hook in hooks %}
+                <li>{{ hook.0 }}<br>{{ hook.1 }}</li>
+            {% endfor %}
+        </ul>
+    </p>
+</body>
+</html>
