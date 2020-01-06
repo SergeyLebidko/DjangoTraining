@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.db.models import Count, Max, Min, Avg, Sum, F
+from django.db.models import Count, Max, Min, Avg, Sum, F, Q
 from django.views.decorators.http import require_GET
 from datetime import date, timedelta
 import random
@@ -93,9 +93,7 @@ def statistic(request):
     result['Список товаров с остатками и ценами'] = list(products)
 
     # Суммарная стоимость всех товаров на складе
-    product_balance = F('balance')
-    product_price = F('price')
-    total_cost = Product.objects.aggregate(summary_cost=Sum(product_balance*product_price))
+    total_cost = Product.objects.aggregate(summary_cost=Sum(F('balance')*F('price')))
     result['Суммарная стоимость всех товаров на складе'] = total_cost['summary_cost']
 
     # Количество заказов
@@ -107,10 +105,27 @@ def statistic(request):
         'client__title',
         'product__title',
         'dt_create',
+        'count',
         F('count')*F('product__price')
     )
     orders_list = list(orders_list)
-    orders_list.sort(reverse=True, key=lambda e: e[3])
+    orders_list.sort(reverse=True, key=lambda e: e[4])
     result['Список заказов с суммой каждого заказа'] = orders_list
+
+    # Среднее количество товаров в заказе
+    avg_count_in_order = Order.objects.aggregate(Avg('count'))['count__avg']
+    result['Среднее количество товаров в заказе'] = avg_count_in_order
+
+    # Получаем список клиентов и для каждого подсчитываем сумму сделанных им заказов
+    # Клиенты, не сделавшие ни одного заказа - отсекаются (filter(sum_counts__isnull=False))
+    # Результаты сортируются по возрастанию суммы заказа
+    clients = Client.objects.annotate(
+        sum_counts=Sum(
+            F('order__count')*F('order__product__price')
+        )
+    ).filter(sum_counts__isnull=False).order_by('sum_counts')
+    result['Список клиентов и сумма их заказов'] = [
+        {client.title: client.sum_counts} for client in clients
+    ]
 
     return JsonResponse(result)
