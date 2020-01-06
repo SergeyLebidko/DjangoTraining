@@ -4,8 +4,8 @@ def parameters_checker(get_response):
 
         # Выставляем значение по-умолчанию для количества создаваемых заказов
         if request.path == '/create_orders/':
-            if 'count' not in request.GET:
-                request.default_order_count = 20
+            if 'orders_count' not in request.GET:
+                request.default_orders_count = 20
 
         response = get_response(request)
         return response
