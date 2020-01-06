@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_POST, require_GET
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET
 
 
 @require_GET
@@ -14,8 +13,9 @@ def index(request):
     return render(request, 'main/hooks.html', context)
 
 
-@csrf_exempt
-@require_POST
+@require_GET
 def create_orders(request):
-    count = request.GET['count']
+    count = request.GET.get('count')
+    if not count:
+        count = request.default_order_count
     return HttpResponse('Количество созданных заказов: '+str(count))
