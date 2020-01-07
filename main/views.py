@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.db.models import Count, Max, Min, Avg, Sum, F, Q
+from django.db.models import Count, Max, Min, Avg, Sum, F, Prefetch
 from django.views.decorators.http import require_GET
 from datetime import date, timedelta
 import random
@@ -150,6 +150,22 @@ def statistic(request):
             'Товар': product.title,
             'Превышение количества': (product.sum_counts - product.balance)
         } for product in products_over_balance
+    ]
+
+    # Пример использования класса Prefetch: выбор всех клиентов, которые заказывали видеокарты
+    video_pr = Prefetch(
+        'order_set',
+        queryset=Order.objects.filter(product__title__istartswith='Видеокарта'),
+        to_attr='video_orders'
+    )
+    clients_videocard = Client.objects.prefetch_related(video_pr).all()
+    result['Клиенты, заказавшие видеокарты'] = [
+        {
+            'Клиент': client.title,
+            'Заказы': [
+                order.__str__() for order in client.video_orders
+            ]
+        } for client in clients_videocard if client.video_orders
     ]
 
     return JsonResponse(result)
