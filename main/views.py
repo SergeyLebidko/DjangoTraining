@@ -119,13 +119,37 @@ def statistic(request):
     # Получаем список клиентов и для каждого подсчитываем сумму сделанных им заказов
     # Клиенты, не сделавшие ни одного заказа - отсекаются (filter(sum_counts__isnull=False))
     # Результаты сортируются по возрастанию суммы заказа
-    clients = Client.objects.annotate(
+    clients_order_cost = Client.objects.annotate(
         sum_counts=Sum(
             F('order__count')*F('order__product__price')
         )
     ).filter(sum_counts__isnull=False).order_by('sum_counts')
     result['Список клиентов и сумма их заказов'] = [
-        {client.title: client.sum_counts} for client in clients
+        {client.title: client.sum_counts} for client in clients_order_cost
+    ]
+
+    # Получаем список клиентов, превысивших свой кредитный лимит
+    clients_over_limit = Client.objects.annotate(
+        sum_counts=Sum(
+            F('order__count')*F('order__product__price')
+        )
+    ).filter(sum_counts__isnull=False, sum_counts__gt=F('credit_limit'))
+    result['Список клиентов, превысивших свой кредитный лимит'] = [
+        {
+            'Клиент': client.title,
+            'Превышение лимина': (client.sum_counts-client.credit_limit)
+        } for client in clients_over_limit
+    ]
+
+    # Получаем товары, которых заказано больше их наличия на складе
+    products_over_balance = Product.objects.annotate(
+        sum_counts=Sum('order__count')
+    ).filter(sum_counts__isnull=False, sum_counts__gt=F('balance'))
+    result['Список товаров, которых заказано больше их количества на складе'] = [
+        {
+            'Товар': product.title,
+            'Превышение количества': (product.sum_counts - product.balance)
+        } for product in products_over_balance
     ]
 
     return JsonResponse(result)
