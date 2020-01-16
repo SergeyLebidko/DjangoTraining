@@ -4,6 +4,7 @@ from django.db import models
 class Client(models.Model):
     title = models.CharField(max_length=100, verbose_name='Название клиента')
     credit_limit = models.IntegerField(verbose_name='Кредитный лимит')
+    vip = models.BooleanField(verbose_name='VIP-клиент', default=False)
 
     def __str__(self):
         return self.title

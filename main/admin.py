@@ -4,7 +4,7 @@ from .models import Client, Product, Order
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('title', 'credit_limit')
+    list_display = ('title', 'credit_limit', 'vip')
     list_display_links = ('title',)
 
 

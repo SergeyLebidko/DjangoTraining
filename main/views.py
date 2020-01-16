@@ -6,6 +6,8 @@ from datetime import date, timedelta
 import random
 
 from .models import Order, Client, Product
+from django.utils import timezone
+import datetime
 
 
 @require_GET
@@ -167,5 +169,15 @@ def statistic(request):
             ]
         } for client in clients_videocard if client.video_orders
     ]
+
+    return JsonResponse(result)
+
+
+@require_GET
+def spec_stat(request, stat_type):
+    # Получаем сумму всех кретидных лимитов клиентов
+    if stat_type == 'sum_limits':
+        sum_limits = Client.objects.aggregate(sum=Sum('credit_limit'))['sum']
+        result = {'Сумма кредитных лимитов клиентов': sum_limits}
 
     return JsonResponse(result)

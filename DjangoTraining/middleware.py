@@ -11,3 +11,15 @@ def parameters_checker(get_response):
         return response
 
     return core_middleware
+
+
+class MiddleTest:
+
+    def __init__(self, next_middle_func):
+        self.next_middle_func = next_middle_func
+
+    def __call__(self, request, *args, **kwargs):
+        print('Сработал посредник-класс')
+        response = self.next_middle_func(request)
+        return response
+

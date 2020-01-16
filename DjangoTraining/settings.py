@@ -49,7 +49,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'DjangoTraining.middleware.parameters_checker'
+    'DjangoTraining.middleware.parameters_checker',
+    'DjangoTraining.middleware.MiddleTest'
 ]
 
 ROOT_URLCONF = 'DjangoTraining.urls'
@@ -115,7 +116,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+# USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
