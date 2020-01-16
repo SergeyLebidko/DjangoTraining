@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.db.models import Count, Max, Min, Avg, Sum, F, Q, Prefetch
 from django.views.decorators.http import require_GET
@@ -231,3 +232,7 @@ def spec_stat(request, stat_type):
         print(result)
 
     return JsonResponse(result)
+
+
+def test_response(request):
+    return HttpResponse('Тестирование работы с ответами')
