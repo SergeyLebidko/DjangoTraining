@@ -1,13 +1,11 @@
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.db.models import Count, Max, Min, Avg, Sum, F, Prefetch
+from django.db.models import Count, Max, Min, Avg, Sum, F, Q, Prefetch
 from django.views.decorators.http import require_GET
 from datetime import date, timedelta
 import random
 
 from .models import Order, Client, Product
-from django.utils import timezone
-import datetime
 
 
 @require_GET
@@ -15,7 +13,13 @@ def index(request):
     context = {
         'hooks': [
             ['GET /create_orders/?count=<Количество создаваемых заказов>', 'Создает в базе новый набор заказов'],
-            ['GET /statistic/', 'Возвращает статистику по клиентам/заказам/товарам']
+            ['GET /statistic/', 'Возвращает статистику по клиентам/заказам/товарам'],
+            ['GET /spec_stat/sum_limits', 'Возвращает сумму кредитных лимитов всех клиентов'],
+            ['GET /spec_stat/sum_limits_vip', 'Возвращает сумму кредитных лимитов vip-клиентов'],
+            ['GET /spec_stat/limit_over_avg', 'Возвращает всех клиентов, у которых кредитный лимит выше среднего'],
+            ['GET /spec_stat/clients_and_orders', 'Клиенты и список их заказов'],
+            ['GET /spec_stat/vip_clients_and_orders_video', 'vip-клиенты и список их заказов, включающих видеокарты'],
+            ['GET /spec_stat/products_cost', 'Список товаров с их полной стоимостью (цена*количество)']
         ]
     }
     return render(request, 'main/hooks.html', context)
@@ -179,5 +183,51 @@ def spec_stat(request, stat_type):
     if stat_type == 'sum_limits':
         sum_limits = Client.objects.aggregate(sum=Sum('credit_limit'))['sum']
         result = {'Сумма кредитных лимитов клиентов': sum_limits}
+
+    # Получаем сумму кредитных лимитов всех клиентов
+    if stat_type == 'sum_limits_vip':
+        sum_limits_vip = Client.objects.aggregate(
+            sum=Sum('credit_limit', filter=Q(vip=True))
+        )['sum']
+        result = {'Сумма кредитных лимитов VIP-клиентов': sum_limits_vip}
+
+    # Получаем всех клиентов, у которых кредитный лимит выше среднего
+    if stat_type == 'limit_over_avg':
+        avg_limit = Client.objects.aggregate(avg=Avg('credit_limit'))['avg']
+        clients = Client.objects.filter(
+            credit_limit__gt=avg_limit
+        ).values_list(
+            'title', flat=True
+        )
+        result = {'Клиенты, у которых кредитный лимит выше среднего': list(clients)}
+
+    # Клиенты и список их заказов
+    if stat_type == 'clients_and_orders':
+        clients = Client.objects.prefetch_related('order_set').all()
+
+        result = {}
+        for client in clients:
+            result[client.title] = list(client.order_set.all().values('product__title', 'count'))
+
+    # vip-клиенты и список их заказов, включающих видеокарты
+    if stat_type == 'vip_clients_and_orders_video':
+        pr = Prefetch('order_set', queryset=Order.objects.filter(product__title__contains='Видеокарта'))
+        clients = Client.objects.prefetch_related(pr).filter(vip=True)
+        result = {}
+        for client in clients:
+            order_list = list(client.order_set.values_list('product__title', 'count'))
+            if order_list:
+                result[client.title] = order_list
+
+    # Полная стоимость каждого товара на складе
+    if stat_type == 'products_cost':
+        products_with_coast = Product.objects.annotate(coast=F('price')*F('balance'))
+        result = {'Список товаров': [
+            {
+                'Товар': p.title,
+                'Полная строимость (цена*остаток)': p.coast
+            } for p in products_with_coast
+        ]}
+        print(result)
 
     return JsonResponse(result)

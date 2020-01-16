@@ -19,7 +19,8 @@ class MiddleTest:
         self.next_middle_func = next_middle_func
 
     def __call__(self, request, *args, **kwargs):
-        print('Сработал посредник-класс')
+        print('Посредник-класс до вызова контроллера')
         response = self.next_middle_func(request)
+        print('Посредник-класс после вызова контроллера')
         return response
 
