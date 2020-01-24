@@ -1,5 +1,8 @@
 from django.http import JsonResponse
-from django.http.response import HttpResponse
+
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
 from django.shortcuts import render
 from django.db.models import Count, Max, Min, Avg, Sum, F, Q, Prefetch
 from django.views.decorators.http import require_GET
@@ -7,6 +10,7 @@ from datetime import date, timedelta
 import random
 
 from .models import Order, Client, Product
+from .serializers import ClientSerializer
 
 
 @require_GET
@@ -20,7 +24,9 @@ def index(request):
             ['GET /spec_stat/limit_over_avg', 'Возвращает всех клиентов, у которых кредитный лимит выше среднего'],
             ['GET /spec_stat/clients_and_orders', 'Клиенты и список их заказов'],
             ['GET /spec_stat/vip_clients_and_orders_video', 'vip-клиенты и список их заказов, включающих видеокарты'],
-            ['GET /spec_stat/products_cost', 'Список товаров с их полной стоимостью (цена*количество)']
+            ['GET /spec_stat/products_cost', 'Список товаров с их полной стоимостью (цена*количество)'],
+            ['GET /get_clients', 'Список клиентов (формируется с помощью DRF)'],
+            ['GET /create_client', 'Создать клиента (формируется с помощью DRF)'],
         ]
     }
     return render(request, 'main/hooks.html', context)
@@ -234,5 +240,22 @@ def spec_stat(request, stat_type):
     return JsonResponse(result)
 
 
-def test_response(request):
-    return HttpResponse('Тестирование работы с ответами')
+@api_view(['GET'])
+def get_clients(request):
+    clients = Client.objects.all()
+    serializer = ClientSerializer(clients, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+def create_client(request):
+    serializer = ClientSerializer(data=request.data)
+    serializer.is_valid()
+    serializer.save()
+    return Response('Запрос принят и успешно обработан')
+
+
+# @api_view(['GET'])
+def test(request):
+    from django.http import HttpResponse
+    return HttpResponse(request.GET['dt'])

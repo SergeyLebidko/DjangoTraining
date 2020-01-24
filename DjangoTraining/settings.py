@@ -53,6 +53,10 @@ MIDDLEWARE = [
     'DjangoTraining.middleware.MiddleTest'
 ]
 
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'DjangoTraining.utils.custom_exception_handler'
+}
+
 ROOT_URLCONF = 'DjangoTraining.urls'
 
 TEMPLATES = [
