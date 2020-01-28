@@ -255,6 +255,7 @@ def create_client(request):
     return Response('Запрос принят и успешно обработан')
 
 
+# Контроллер для быстрого тестирования различных фишек django / drf
 # @api_view(['GET'])
 def test(request):
     from django.http import HttpResponse
