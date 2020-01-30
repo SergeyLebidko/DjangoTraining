@@ -10,7 +10,8 @@ from datetime import date, timedelta
 import random
 
 from .models import Order, Client, Product
-from .serializers import ClientSerializer
+from .serializers import ClientSerializer, PersonSerializer
+from .addition import Person
 
 
 @require_GET
@@ -253,6 +254,29 @@ def create_client(request):
     serializer.is_valid()
     serializer.save()
     return Response('Запрос принят и успешно обработан')
+
+
+@api_view(['GET', 'POST'])
+def person_demo(request):
+    if request.method == 'GET':
+        person = Person('Сергей Лебидко', 'm', 35, 'sergeyler@mail.ru')
+        serializer = PersonSerializer(person)
+        return Response([serializer.data])
+
+    if request.method == 'POST':
+
+        person_for_update = Person(name='Вася Пупкин', gender='m', age=15, email='zadrott@gmail.com')
+        original_data = str(person_for_update)
+
+        serializer = PersonSerializer(data=request.data, instance=person_for_update)
+        if serializer.is_valid():
+            return Response({
+                'Данные до обновления экземпляра': original_data,
+                'Валидированные данные': serializer.validated_data,
+                'Данные после обновления экземпляра': str(serializer.save())
+            })
+        else:
+            return Response('Переданные данные не валидны')
 
 
 # Контроллер для быстрого тестирования различных фишек django / drf
