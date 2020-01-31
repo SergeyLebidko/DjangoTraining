@@ -276,7 +276,7 @@ def person_demo(request):
                 'Данные после обновления экземпляра': str(serializer.save())
             })
         else:
-            return Response('Переданные данные не валидны')
+            return Response(serializer.errors)
 
 
 # Контроллер для быстрого тестирования различных фишек django / drf

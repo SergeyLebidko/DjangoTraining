@@ -1,6 +1,13 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from .addition import Person
 from .models import Client
+
+
+def gender_validator(field):
+    if field.lower() not in ['мужской', 'женский']:
+        raise ValidationError('Неверное значение поля Пол')
+    return field
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -11,7 +18,7 @@ class ClientSerializer(serializers.ModelSerializer):
 
 class PersonSerializer(serializers.Serializer):
     name = serializers.CharField()
-    gender = serializers.CharField(max_length=1)
+    gender = serializers.CharField(validators=[gender_validator])
     age = serializers.IntegerField(max_value=120)
     email = serializers.CharField()
 
