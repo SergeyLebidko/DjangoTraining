@@ -20,14 +20,16 @@ def index(request):
         'hooks': [
             ['GET /create_orders/?count=<Количество создаваемых заказов>', 'Создает в базе новый набор заказов'],
             ['GET /statistic/', 'Возвращает статистику по клиентам/заказам/товарам'],
-            ['GET /spec_stat/sum_limits', 'Возвращает сумму кредитных лимитов всех клиентов'],
-            ['GET /spec_stat/sum_limits_vip', 'Возвращает сумму кредитных лимитов vip-клиентов'],
-            ['GET /spec_stat/limit_over_avg', 'Возвращает всех клиентов, у которых кредитный лимит выше среднего'],
-            ['GET /spec_stat/clients_and_orders', 'Клиенты и список их заказов'],
-            ['GET /spec_stat/vip_clients_and_orders_video', 'vip-клиенты и список их заказов, включающих видеокарты'],
-            ['GET /spec_stat/products_cost', 'Список товаров с их полной стоимостью (цена*количество)'],
-            ['GET /get_clients', 'Список клиентов (формируется с помощью DRF)'],
-            ['GET /create_client', 'Создать клиента (формируется с помощью DRF)'],
+            ['GET /spec_stat/sum_limits/', 'Возвращает сумму кредитных лимитов всех клиентов'],
+            ['GET /spec_stat/sum_limits_vip/', 'Возвращает сумму кредитных лимитов vip-клиентов'],
+            ['GET /spec_stat/limit_over_avg/', 'Возвращает всех клиентов, у которых кредитный лимит выше среднего'],
+            ['GET /spec_stat/clients_and_orders/', 'Клиенты и список их заказов'],
+            ['GET /spec_stat/vip_clients_and_orders_video/', 'vip-клиенты и список их заказов, включающих видеокарты'],
+            ['GET /spec_stat/products_cost/', 'Список товаров с их полной стоимостью (цена*количество)'],
+            ['GET /get_clients/', 'Список клиентов (формируется с помощью DRF)'],
+            ['GET /create_client/', 'Создать клиента (формируется с помощью DRF)'],
+            ['GET /test/', 'Хук для тестовых запросов'],
+            ['GET или POST /person_demo/', 'Хук для тестирования работы с сериализатором обычного объекта'],
         ]
     }
     return render(request, 'main/hooks.html', context)
