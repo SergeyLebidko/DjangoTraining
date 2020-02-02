@@ -22,9 +22,14 @@ class SimpleClientSerializer(serializers.ModelSerializer):
         fields = ('title', 'credit_limit', 'vip')
 
 
-class ClientSerializer(serializers.ModelSerializer):
+class FictiveKey(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        print(self.context)
+        return Order.objects.filter(count__gt=5)
 
-    order_set = serializers.StringRelatedField(many=True)
+
+class ClientSerializer(serializers.ModelSerializer):
+    order_set = FictiveKey(many=True)
 
     class Meta:
         model = Client

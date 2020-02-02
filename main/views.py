@@ -252,7 +252,7 @@ def get_clients(request):
 
 @api_view(['POST'])
 def create_client(request):
-    serializer = SimpleClientSerializer(data=request.data)
+    serializer = ClientSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response('Запрос принят и успешно обработан')
