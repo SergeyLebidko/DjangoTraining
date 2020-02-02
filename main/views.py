@@ -10,7 +10,7 @@ from datetime import date, timedelta
 import random
 
 from .models import Order, Client, Product
-from .serializers import SimpleClientSerializer, PersonSerializer
+from .serializers import SimpleClientSerializer, ClientSerializer, PersonSerializer
 from .addition import Person
 
 
@@ -258,6 +258,13 @@ def create_client(request):
         return Response('Запрос принят и успешно обработан')
     else:
         return Response(serializer.errors)
+
+
+@api_view(['GET'])
+def get_detailed_clients(request):
+    clients = Client.objects.all()
+    serializer = ClientSerializer(clients, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['GET', 'POST'])
