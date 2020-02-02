@@ -10,7 +10,13 @@ def gender_validator(field):
     return field
 
 
-class ClientSerializer(serializers.ModelSerializer):
+class SimpleClientSerializer(serializers.ModelSerializer):
+
+    def validate(self, data):
+        if data.get('vip') and data.get('credit_limit') < 100000:
+            raise ValidationError('VIP-клиент не модет иметь кредитный лимит меньше 100 000')
+        return data
+
     class Meta:
         model = Client
         fields = ('title', 'credit_limit', 'vip')
