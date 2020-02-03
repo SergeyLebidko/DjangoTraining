@@ -3,9 +3,9 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, DestroyModelMixin
 
 from django.shortcuts import render
 from django.db.models import Count, Max, Min, Avg, Sum, F, Q, Prefetch
@@ -16,7 +16,7 @@ import random
 from .models import Order, Client, Product
 from .serializers import SimpleClientSerializer, ClientSerializer, PersonSerializer, ProductSerializer
 from .addition import Person
-
+from .permissions import MyPermission
 
 @require_GET
 def index(request):
@@ -307,7 +307,7 @@ class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
 
 
-class ClientViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateModelMixin):
+class ClientViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateModelMixin, DestroyModelMixin):
     queryset = Client.objects.all()
     serializer_class = SimpleClientSerializer
 
@@ -326,6 +326,12 @@ def show_current_user(request):
 # Класс-контроллер выхода с сайта
 class Logout(LogoutView):
     next_page = reverse_lazy('show_current_user')
+
+
+@api_view(['GET'])
+@permission_classes([MyPermission])
+def test_permission(request):
+    return Response('Тест разрешений выполнен успешно')
 
 
 # Контроллер для быстрого тестирования различных фишек django / drf
