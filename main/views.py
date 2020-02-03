@@ -30,6 +30,8 @@ def index(request):
             ['GET /create_client/', 'Создать клиента (формируется с помощью DRF)'],
             ['GET /test/', 'Хук для тестовых запросов'],
             ['GET или POST /person_demo/', 'Хук для тестирования работы с сериализатором обычного объекта'],
+            ['GET /get_detailed_clients/', 'Выводит список клиентов, свомещенный со списками id их заказов'],
+            ['GET /get_url_list/', 'Выводит список всех элементов списка urlpatterns'],
         ]
     }
     return render(request, 'main/hooks.html', context)
@@ -252,7 +254,7 @@ def get_clients(request):
 
 @api_view(['POST'])
 def create_client(request):
-    serializer = ClientSerializer(data=request.data)
+    serializer = SimpleClientSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response('Запрос принят и успешно обработан')
@@ -288,6 +290,12 @@ def person_demo(request):
             })
         else:
             return Response(serializer.errors)
+
+
+@api_view(['GET'])
+def get_urls_list(request):
+    from .urls import urlpatterns
+    return Response([str(url) for url in urlpatterns])
 
 
 # Контроллер для быстрого тестирования различных фишек django / drf
