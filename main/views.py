@@ -1,4 +1,6 @@
 from django.http import JsonResponse
+from django.contrib.auth.views import LoginView, LogoutView
+from django.urls import reverse_lazy
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -308,6 +310,22 @@ class ProductViewSet(ModelViewSet):
 class ClientViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateModelMixin):
     queryset = Client.objects.all()
     serializer_class = SimpleClientSerializer
+
+
+# Класс-контроллер входа на сайт
+class Login(LoginView):
+    template_name = 'main/login.html'
+
+
+# Контроллер отображает страницу текущего пользователя
+@require_GET
+def show_current_user(request):
+    return render(request, 'main/current_user.html', {})
+
+
+# Класс-контроллер выхода с сайта
+class Logout(LogoutView):
+    next_page = reverse_lazy('show_current_user')
 
 
 # Контроллер для быстрого тестирования различных фишек django / drf

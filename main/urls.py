@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.routers import SimpleRouter
 
 from .views import index, create_orders, statistic, spec_stat, get_clients, get_detailed_clients, \
-    create_client, test, person_demo, get_urls_list, ProductViewSet, ClientViewSet
+    create_client, test, person_demo, get_urls_list, ProductViewSet, ClientViewSet, Login, show_current_user, Logout
 
 urlpatterns = [
     path('create_orders/', create_orders, name='create_orders'),
@@ -15,6 +15,9 @@ urlpatterns = [
     path('get_detailed_clients/', get_detailed_clients, name='get_detailed_clients'),
     path('get_url_list/', get_urls_list, name='get_url_list'),
 
+    path('login/', Login.as_view(), name='login'),
+    path('show_current_user/', show_current_user, name='show_current_user'),
+    path('logout/', Logout.as_view(), name='logout'),
     path('', index, name='index')
 ]
 
