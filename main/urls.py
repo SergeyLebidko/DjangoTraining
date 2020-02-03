@@ -3,7 +3,7 @@ from rest_framework.routers import SimpleRouter
 
 from .views import index, create_orders, statistic, spec_stat, get_clients, get_detailed_clients, \
     create_client, test, person_demo, get_urls_list, ProductViewSet, ClientViewSet, Login, show_current_user, Logout, \
-    test_permission
+    test_permission, OrderViewSet, clear_orders
 
 urlpatterns = [
     path('create_orders/', create_orders, name='create_orders'),
@@ -21,11 +21,14 @@ urlpatterns = [
     path('logout/', Logout.as_view(), name='logout'),
     path('test_permission/', test_permission, name='test_permission'),
 
+    path('clear_orders/', clear_orders, name='clear_orders'),
+
     path('', index, name='index')
 ]
 
 router = SimpleRouter()
 router.register('products', ProductViewSet)
 router.register('clients', ClientViewSet)
+router.register('orders', OrderViewSet)
 
 urlpatterns.extend(router.urls)

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from .addition import Person
-from .models import Client, Product
+from .models import Client, Product, Order
 
 
 def gender_validator(field):
@@ -37,6 +37,12 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'title', 'balance', 'price']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['id', 'dt_create', 'client', 'product', 'count', '__str__']
 
 
 class PersonSerializer(serializers.Serializer):

@@ -14,7 +14,7 @@ from datetime import date, timedelta
 import random
 
 from .models import Order, Client, Product
-from .serializers import SimpleClientSerializer, ClientSerializer, PersonSerializer, ProductSerializer
+from .serializers import SimpleClientSerializer, ClientSerializer, PersonSerializer, ProductSerializer, OrderSerializer
 from .addition import Person
 from .permissions import MyPermission
 
@@ -312,6 +312,11 @@ class ClientViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateMo
     serializer_class = SimpleClientSerializer
 
 
+class OrderViewSet(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+
 # Класс-контроллер входа на сайт
 class Login(LoginView):
     template_name = 'main/login.html'
@@ -332,6 +337,12 @@ class Logout(LogoutView):
 @permission_classes([MyPermission])
 def test_permission(request):
     return Response('Тест разрешений выполнен успешно')
+
+
+@api_view(['GET'])
+def clear_orders(request):
+    count = Order.objects.all().delete()[0]
+    return Response(f'Удалено заказов: {count}')
 
 
 # Контроллер для быстрого тестирования различных фишек django / drf
