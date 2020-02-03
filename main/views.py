@@ -2,6 +2,8 @@ from django.http import JsonResponse
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin
 
 from django.shortcuts import render
 from django.db.models import Count, Max, Min, Avg, Sum, F, Q, Prefetch
@@ -10,7 +12,7 @@ from datetime import date, timedelta
 import random
 
 from .models import Order, Client, Product
-from .serializers import SimpleClientSerializer, ClientSerializer, PersonSerializer
+from .serializers import SimpleClientSerializer, ClientSerializer, PersonSerializer, ProductSerializer
 from .addition import Person
 
 
@@ -296,6 +298,16 @@ def person_demo(request):
 def get_urls_list(request):
     from .urls import urlpatterns
     return Response([str(url) for url in urlpatterns])
+
+
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+
+class ClientViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin, CreateModelMixin):
+    queryset = Client.objects.all()
+    serializer_class = SimpleClientSerializer
 
 
 # Контроллер для быстрого тестирования различных фишек django / drf

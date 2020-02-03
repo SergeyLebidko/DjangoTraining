@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from .addition import Person
-from .models import Client, Order
+from .models import Client, Product
 
 
 def gender_validator(field):
@@ -17,23 +17,26 @@ class SimpleClientSerializer(serializers.ModelSerializer):
             raise ValidationError('VIP-клиент не модет иметь кредитный лимит меньше 100 000')
         return data
 
+    def validate_credit_limit(self, field):
+        if field <= 0:
+            raise ValidationError('Слишком маленький кредитный лимит')
+        return field
+
     class Meta:
         model = Client
-        fields = ('title', 'credit_limit', 'vip')
-
-
-class FictiveKey(serializers.PrimaryKeyRelatedField):
-    def get_queryset(self):
-        print(self.context)
-        return Order.objects.filter(count__gt=5)
+        fields = ('title', 'credit_limit', 'vip', 'id')
 
 
 class ClientSerializer(serializers.ModelSerializer):
-    order_set = FictiveKey(many=True)
-
     class Meta:
         model = Client
         fields = ['title', 'credit_limit', 'vip', 'order_set']
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'balance', 'price']
 
 
 class PersonSerializer(serializers.Serializer):
