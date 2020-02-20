@@ -38,6 +38,10 @@ class Order(models.Model):
     def __str__(self):
         return f'Заказ клиента: {self.client} от: {self.dt_create} на товар: {self.product} количество: {self.count}'
 
+    def delete(self, using=None, keep_parents=False):
+        print(f'Вызван метод delete для заказа: {self}')
+        super(Order, self).delete(using=None, keep_parents=False)
+
     class Meta:
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
